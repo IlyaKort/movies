@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.testtask.movies.data.models.Movie
 import com.testtask.movies.data.MoviesRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,7 +29,8 @@ class MoviesViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 isLoadingLiveData.postValue(true)
-                moviesListLiveData.postValue(repository.searchMovies(offset, sort))
+                val movies = repository.addMoviesInList(repository.searchMovies(offset, sort))
+                moviesListLiveData.postValue(movies)
             } catch (t: Throwable) {
                 Log.e("MoviesViewModel", "error", t)
                 moviesListLiveData.postValue(emptyList())

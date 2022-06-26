@@ -20,7 +20,7 @@ class MoviesListActivity : AppCompatActivity(R.layout.activity_movies_list) {
     private val viewModel by viewModels<MoviesViewModel>()
     private var movieAdapter: MovieAdapter? = null
 
-    private var pageOfCollections = 1
+    private var pageOfCollections = 0
     private var sorting = "by-opening-date"
     private var isLoadingPage = false
 
@@ -28,7 +28,7 @@ class MoviesListActivity : AppCompatActivity(R.layout.activity_movies_list) {
         super.onCreate(savedInstanceState)
         initList()
         bindViewModel()
-        viewModel.search(0, sorting)
+        viewModel.search(pageOfCollections, sorting)
     }
 
     private fun initList() {
@@ -50,30 +50,10 @@ class MoviesListActivity : AppCompatActivity(R.layout.activity_movies_list) {
                     val lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition()
 
                     if (!isLoadingPage && totalItemCount <=
-                        lastVisibleItem + 1
+                        lastVisibleItem + 2
                     ) {
-                        if (pageOfCollections / 20 >= 1) {
-                            binding.previousPageButton.isVisible = true
-                        }
-                        binding.nextPageButton.isVisible = true
-
-                        binding.previousPageButton.setOnClickListener {
-                            pageOfCollections -= 20
-                            viewModel.search(pageOfCollections, sorting)
-                            binding.nextPageButton.isVisible = false
-                            binding.previousPageButton.isVisible = false
-                        }
-
-                        binding.nextPageButton.setOnClickListener {
-                            pageOfCollections += 20
-                            viewModel.search(pageOfCollections, sorting)
-                            binding.nextPageButton.isVisible = false
-                            binding.previousPageButton.isVisible = false
-                        }
-
-                    } else {
-                        binding.nextPageButton.isVisible = false
-                        binding.previousPageButton.isVisible = false
+                        pageOfCollections += 20
+                        viewModel.search(pageOfCollections, sorting)
                     }
                 }
             })
@@ -88,6 +68,9 @@ class MoviesListActivity : AppCompatActivity(R.layout.activity_movies_list) {
     private fun updateLoadingState(isLoading: Boolean) {
         binding.progressBar.isVisible = isLoading
         isLoadingPage = isLoading
+        if (pageOfCollections != 0) {
+            binding.linearProgressBar.isVisible = isLoading
+        }
     }
 
     override fun onBackPressed() {}
